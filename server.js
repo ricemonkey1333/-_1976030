@@ -11,13 +11,17 @@ require('dotenv').config(); // 환경 변수 로드
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Firebase Admin SDK 초기화
-const serviceAccount = require('./serviceAccountKey.json'); // 서비스 계정 키 파일 경로
+const admin = require('firebase-admin');
 
+// 환경 변수에서 JSON 문자열로 로드
+const serviceAccountKey = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
+
+// Firebase 초기화
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DATABASE_URL // 환경 변수 사용
+  credential: admin.credential.cert(serviceAccountKey),
+  databaseURL: "https://public-facilities-76f26-default-rtdb.firebaseio.com/",
 });
+
 
 // 미들웨어 설정
 app.use(express.json()); // JSON 바디 파싱
@@ -43,15 +47,14 @@ app.use(cors()); // CORS 허용 (필요에 따라 설정)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 라우터 모듈 불러오기
-const googleMapsRouter = require('./routes/googleMaps'); // Google Maps 라우터
+
 const facilitiesRouter = require('./routes/facilities');
 const directionsRouter = require('./routes/directions');
 const dataRouter = require('./routes/data');
 const feedbackRouter = require('./routes/feedback');
 const metricsRouter = require('./routes/metrics');
 
-// 라우터 마운트
-app.use('/', googleMapsRouter); // /apiKey 엔드포인트를 루트에 마운트
+
 app.use('/routes/facilities', facilitiesRouter);
 app.use('/routes/directions', directionsRouter);
 app.use('/routes/data', dataRouter);

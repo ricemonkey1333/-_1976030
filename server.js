@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const fetch = require('node-fetch');
 const helmet = require('helmet');
@@ -11,7 +9,6 @@ require('dotenv').config(); // 환경 변수 로드
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 // 환경 변수에서 JSON 문자열로 로드
 const serviceAccountKey = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 
@@ -20,7 +17,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
   databaseURL: "https://public-facilities-76f26-default-rtdb.firebaseio.com/",
 });
-
 
 // 미들웨어 설정
 app.use(express.json()); // JSON 바디 파싱
@@ -45,14 +41,21 @@ app.use(cors()); // CORS 허용 (필요에 따라 설정)
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 라우터 모듈 불러오기
+// Google Maps API Key 엔드포인트
+app.get('/apiKey', (req, res) => {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Google Maps API 키가 설정되어 있지 않습니다.' });
+  }
+  res.json({ apiKey });
+});
 
+// 라우터 모듈 불러오기
 const facilitiesRouter = require('./routes/facilities');
 const directionsRouter = require('./routes/directions');
 const dataRouter = require('./routes/data');
 const feedbackRouter = require('./routes/feedback');
 const metricsRouter = require('./routes/metrics');
-
 
 app.use('/routes/facilities', facilitiesRouter);
 app.use('/routes/directions', directionsRouter);

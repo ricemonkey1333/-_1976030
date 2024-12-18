@@ -11,7 +11,6 @@ require('dotenv').config(); // 환경 변수 로드
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const admin = require('firebase-admin');
 
 // 환경 변수에서 JSON 문자열로 로드
 const serviceAccountKey = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
